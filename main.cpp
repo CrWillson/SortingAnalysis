@@ -117,22 +117,30 @@ void quickSortMedianThree(int A[], int first, int last) {
     }
 }
 
-int checkSort(int A[], int size) {
+bool isSorted(int A[], int size) {
     for (int i = 1; i < size; i++) {
         int j = i - 1;
         if (j > i) {
-            return 1;
+            return false;
         }
     }
-    return 0;
+    return true;
 }
 
 int main() {
-    int A[] = {7,3,6,1,8,9,2,10,4,5};
+    srand(0);
 
-    quickSortMedianThree(A, 0, 9);
+    for (int n = 1; n < 1000000; n++) {
+        int A[n];
+        for (int i = 0; i < n; i++) {
+            A[i] = (rand() % n) + 1;
+        }
 
-    int check = checkSort(A, 10);
-    cout << check << endl;
+        cout << "Quick sorting size " << n << endl;
+        quickSortOnePointer(A, 0, n);
+        if (!isSorted(A, n)) {
+            break;
+        }
+    }
     return 0;
 }
