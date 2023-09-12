@@ -52,6 +52,7 @@
         "xtree": "cpp",
         "xutility": "cpp",
         "bitset": "cpp",
-        "functional": "cpp"
+        "functional": "cpp",
+        "thread": "cpp"
     }
 }

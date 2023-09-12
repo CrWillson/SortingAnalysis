@@ -32,6 +32,21 @@ int* generateRandomArray(int n) {
 }
 
 /**
+ * Generate a randomized array of size n using a given seed
+ * Used for generating the same random array multiple times instead of cloning it
+ * @return an int array of size n
+*/
+int* generateRandomArray(int n, int seed) {
+    srand(seed);
+
+    int* A = new int[n];
+    for (int i = 0; i < n; i++) {
+            A[i] = (rand() % n) + 1;
+    }
+    return A;
+}
+
+/**
  * Generate a forward sorted array of size n
  * @return an int array of size n
 */
@@ -126,7 +141,7 @@ int partitionOnePointer(int A[], int first, int last) {
  * Quick sort partition method that uses the median of the first, middle, and last
  * element as the pivot.
  * 
- * The two pointer method is used.
+ * The one pointer method is used.
  * @return the index of the lower pointer
 */
 int partitionMedianThree(int A[], int first, int last) {
@@ -160,7 +175,7 @@ int partitionMedianThree(int A[], int first, int last) {
 /**
  * Quick sort partition method that uses the middle index as the pivot.
  * 
- * The two pointer method is used.
+ * The one pointer method is used.
  * @return the index of the lower pointer
 */
 int partitionMiddleIndex(int A[], int first, int last) {
@@ -226,6 +241,7 @@ void forwardQuickTest(int size, function<int(int[], int, int)> partitionMethod) 
         outFile << n << "," << time << "\n";
         delete[] A;
     }
+    outFile.close();
 }
 
 /**
@@ -244,9 +260,10 @@ void reverseQuickTest(int size, function<int(int[], int, int)> partitionMethod) 
         outFile << n << "," << time << "\n";
         delete[] A;
     }
+    outFile.close();
 }
 
-void randomQuickTest(int A[], int size, function<int(int[], int, int)> partitionMethod) {
+void randomQuickTest(int A[], int size, function<int(int[], int, int)> partitionMethod, string name) {
 
 }
 
@@ -301,6 +318,7 @@ void forwardInsertionTest(int size) {
         outFile << n << "," << time << "\n";
         delete[] A;
     }
+    outFile.close();
 }
 
 /**
@@ -318,9 +336,14 @@ void reverseInsertionTest(int size) {
         outFile << n << "," << time << "\n";
         delete[] A;
     }
+    outFile.close();
 }
 
 void randomInsertionTest(int A[], int size) {
+    if (size > 10000) {
+        return;
+    }
+
     ofstream outFile("./output/RandomInsertionSort.csv");
 
     for (int n = 1; n <= size; n++) {
@@ -329,12 +352,21 @@ void randomInsertionTest(int A[], int size) {
 
 }
 
-void allRandomTests(int inSize, int quSize) {
-    for (int n = 1; n < quSize; n++) {
-        int* A = generateRandomArray(n);
+void allRandomTests(int size) {
+    for (int n = 1; n < size; n++) {
+        int randSeed = rand() % 10000000000;
 
-        
-        thread quickTwoPointer(randomQuickTest, A, n, partitionTwoPointer);
+        thread quickTwoPointer(randomQuickTest, generateRandomArray(n, randSeed), n, partitionTwoPointer, "Two");
+        thread quickOnePointer(randomQuickTest, generateRandomArray(n, randSeed), n, partitionOnePointer, "One");
+        thread quickMedianThree(randomQuickTest, generateRandomArray(n, randSeed), n, partitionMedianThree, "Median");
+        thread quickMiddleIndex(randomQuickTest, generateRandomArray(n, randSeed), n, partitionMiddleIndex, "Middle");
+        thread randomInsertion(randomInsertionTest, generateRandomArray(n, randSeed), n);
+
+        quickTwoPointer.join();
+        quickOnePointer.join();
+        quickMedianThree.join();
+        quickMiddleIndex.join();
+        randomInsertion.join();
     }
 }
 
