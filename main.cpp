@@ -263,6 +263,11 @@ void reverseQuickTest(int size, function<int(int[], int, int)> partitionMethod) 
     outFile.close();
 }
 
+/**
+ * Perform a test of the quick sort on randomized array using the given partition method
+ * Outputs to a file titled "RandomQuickSort[name].csv"
+ * The seed is used to generate the same sets of random arrays
+*/
 void randomQuickTest(int size, int seed, function<int(int[], int, int)> partitionMethod, string name) {
     int* seedArray = generateRandomArray(size, seed); 
 
@@ -352,6 +357,10 @@ void reverseInsertionTest(int size) {
     outFile.close();
 }
 
+/**
+ * Perform a test of the insertion sort on randomized array
+ * The seed is used to generate the same sets of random arrays
+*/
 void randomInsertionTest(int size, int seed) {
     if (size > 10000) {
         return;
