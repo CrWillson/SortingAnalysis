@@ -263,8 +263,21 @@ void reverseQuickTest(int size, function<int(int[], int, int)> partitionMethod) 
     outFile.close();
 }
 
-void randomQuickTest(int A[], int size, function<int(int[], int, int)> partitionMethod, string name) {
+void randomQuickTest(int size, int seed, function<int(int[], int, int)> partitionMethod, string name) {
+    int* seedArray = generateRandomArray(size, seed); 
 
+    ofstream outFile("./output/RandomQuickSort" + name + ".csv");
+
+    for (int n = 0; n <= size; n++) {
+        int* A = generateRandomArray(n, seedArray[n]);
+
+        cout << "Random Quick " + name + " sort size " << n << endl;
+        double time = quickTest(A, n, partitionMethod);
+        outFile << n << "," << time << "\n";
+
+        delete[] A;
+    }
+    outFile.close();
 }
 
 /**
@@ -286,7 +299,7 @@ void insertionSort(int A[], int arraySize) {
  * Perform a test of the insertion sort of n elements
  * @return the execution time of the sort in nanoseconds
 */
-double InsertionTest(int A[], int n) {
+double insertionTest(int A[], int n) {
     auto start = chrono::high_resolution_clock::now();
     insertionSort(A, n);
     auto stop = chrono::high_resolution_clock::now();
@@ -314,7 +327,7 @@ void forwardInsertionTest(int size) {
         double time = 0;
         int* A = generateForwardSortedArray(n);
 
-        time = InsertionTest(A, n);
+        time = insertionTest(A, n);
         outFile << n << "," << time << "\n";
         delete[] A;
     }
@@ -332,57 +345,61 @@ void reverseInsertionTest(int size) {
         double time = 0;
         int* A = generateReverseSortedArray(n);
 
-        time = InsertionTest(A, n);
+        time = insertionTest(A, n);
         outFile << n << "," << time << "\n";
         delete[] A;
     }
     outFile.close();
 }
 
-void randomInsertionTest(int A[], int size) {
+void randomInsertionTest(int size, int seed) {
     if (size > 10000) {
         return;
     }
 
+    int* seedArray = generateRandomArray(size, seed); 
+
     ofstream outFile("./output/RandomInsertionSort.csv");
 
-    for (int n = 1; n <= size; n++) {
-        
+    for (int n = 0; n <= size; n++) {
+        int* A = generateRandomArray(n, seedArray[n]);
+
+        cout << "Random Insertion sort size " << n << endl;
+        double time = insertionTest(A, n);
+        outFile << n << "," << time << "\n";
+
+        delete[] A;
     }
-
-}
-
-void allRandomTests(int size) {
-    for (int n = 1; n < size; n++) {
-        int randSeed = rand() % 10000000000;
-
-        thread quickTwoPointer(randomQuickTest, generateRandomArray(n, randSeed), n, partitionTwoPointer, "Two");
-        thread quickOnePointer(randomQuickTest, generateRandomArray(n, randSeed), n, partitionOnePointer, "One");
-        thread quickMedianThree(randomQuickTest, generateRandomArray(n, randSeed), n, partitionMedianThree, "Median");
-        thread quickMiddleIndex(randomQuickTest, generateRandomArray(n, randSeed), n, partitionMiddleIndex, "Middle");
-        thread randomInsertion(randomInsertionTest, generateRandomArray(n, randSeed), n);
-
-        quickTwoPointer.join();
-        quickOnePointer.join();
-        quickMedianThree.join();
-        quickMiddleIndex.join();
-        randomInsertion.join();
-    }
+    outFile.close();
 }
 
 int main() {
     srand(time(0));
+    int randSeed = (rand() % 1000000) + 1;
 
-    thread FInsertionTest(forwardQuickTest, 10000, partitionTwoPointer);
-    //thread RInsertionTest(reverseInsertionTest, 10000);
+    thread forIns(forwardInsertionTest, 10000);
+    thread revIns(reverseInsertionTest, 10000);
+    thread randIns(randomInsertionTest, 10000, randSeed);
 
-    FInsertionTest.join();
-    //RInsertionTest.join();
+    thread forQui(forwardQuickTest, 1000000, partitionOnePointer);
+    thread revQui(reverseQuickTest, 1000000, partitionOnePointer);
+    thread randQuiTwo(randomQuickTest, 1000000, randSeed, partitionTwoPointer, "Two");
+    thread randQuiOne(randomQuickTest, 1000000, randSeed, partitionOnePointer, "One");
+    thread randQuiMed(randomQuickTest, 1000000, randSeed, partitionMedianThree, "Median");
+    thread randQuiMid(randomQuickTest, 1000000, randSeed, partitionMiddleIndex, "Middle");
+
+    forIns.join();
+    revIns.join();
+    randIns.join();
+
+    forQui.join();
+    revQui.join();
+    randQuiTwo.join();
+    randQuiOne.join();
+    randQuiMed.join();
+    randQuiMid.join();
+
     cout << "Completed all tests" << endl;
-/*
-    int A[] = {5,6,8,3,4,7,9,2,10,1};
-
-    quickSort(A, 0, 9, partitionTwoPointer);*/
 
     return 0;
 }
