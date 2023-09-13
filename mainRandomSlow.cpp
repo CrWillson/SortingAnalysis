@@ -228,10 +228,10 @@ double quickTest(int A[], int n, function<int(int[], int, int)> partitionMethod)
     quickSort(A, 0, n - 1, partitionMethod);
     auto stop = chrono::high_resolution_clock::now();
 
-    /*if (!isSorted(A, n)) {
+    if (!isSorted(A, n)) {
             cout << "Invalid sort!" << endl;
             return -1;
-    }*/
+    }
 
     chrono::duration<double, std::nano> ms_double = stop - start;
 
@@ -244,11 +244,11 @@ double quickTest(int A[], int n, function<int(int[], int, int)> partitionMethod)
  * Perform a test of the quick sort on forward sorted arrays from size 1 to 'size'
  * using the given partitionMethod.
 */
-void forwardQuickTest(int start, int size, function<int(int[], int, int)> partitionMethod) {
-    ofstream outFile("./output/ForwardQuickSort.csv");
+void forwardQuickTest(int start, int size, int step, function<int(int[], int, int)> partitionMethod, string name) {
+    ofstream outFile("./output/ForwardQuickSort" + name + ".csv");
 
-    for (int n = start; n <= size; n++) {
-        cout << "Forward Quick sort size: " << n << endl;
+    for (int n = start; n <= size; n += step) {
+        cout << "Forward Quick " + name + " sort size: " << n << endl;
         double time = 0;
         int* A = generateForwardSortedArray(n);
 
@@ -263,11 +263,11 @@ void forwardQuickTest(int start, int size, function<int(int[], int, int)> partit
  * Perform a test of the quick sort on reverse sorted arrays from size 1 to 'size'
  * using the given partitionMethod.
 */
-void reverseQuickTest(int size, function<int(int[], int, int)> partitionMethod) {
-    ofstream outFile("./output/ReverseQuickSort.csv");
+void reverseQuickTest(int start, int size, int step, function<int(int[], int, int)> partitionMethod, string name) {
+    ofstream outFile("./output/ReverseQuickSort" + name + ".csv");
 
-    for (int n = 1; n <= size; n++) {
-        cout << "Reverse Quick sort size: " << n << endl;
+    for (int n = start; n <= size; n += step) {
+        cout << "Reverse Quick " + name + " sort size: " << n << endl;
         double time = 0;
         int* A = generateReverseSortedArray(n);
 
@@ -283,15 +283,15 @@ void reverseQuickTest(int size, function<int(int[], int, int)> partitionMethod) 
  * Outputs to a file titled "RandomQuickSort[name].csv"
  * The seed is used to generate the same sets of random arrays
 */
-void randomQuickTest(int start, int size, int seed, function<int(int[], int, int)> partitionMethod, string name, string number) {
+void randomQuickTest(int start, int size, int step, int seed, function<int(int[], int, int)> partitionMethod, string name) {
     int* seedArray = generateRandomArray(size, seed); 
 
-    ofstream outFile("./output/RandomQuickSort" + name + number + ".csv");
+    ofstream outFile("./output/RandomQuickSort" + name + ".csv");
 
-    for (int n = start; n <= size; n++) {
+    for (int n = start; n <= size; n += step) {
         int* A = generateRandomArray(n, seedArray[n]);
 
-        cout << "Random Quick " + name + number + " sort size " << n << endl;
+        cout << "Random Quick " + name + " sort size " << n << endl;
         double time = quickTest(A, n, partitionMethod);
         outFile << n << "," << time << "\n";
 
@@ -340,10 +340,10 @@ double insertionTest(int A[], int n) {
 /**
  * Perform a test of the insertion sort on forward sorted arrays from size 1 to 'size'
 */
-void forwardInsertionTest(int size) {
+void forwardInsertionTest(int start, int size, int step) {
     ofstream outFile("./output/ForwardInsertionSort.csv");
 
-    for (int n = 1; n <= size; n++) {
+    for (int n = start; n <= size; n += step) {
         cout << "Forward Insertion sort size: " << n << endl;
         double time = 0;
         int* A = generateForwardSortedArray(n);
@@ -358,10 +358,10 @@ void forwardInsertionTest(int size) {
 /**
  * Perform a test of the insertion sort on reverse sorted arrays from size 1 to 'size'
 */
-void reverseInsertionTest(int size) {
+void reverseInsertionTest(int start, int size, int step) {
     ofstream outFile("./output/ReverseInsertionSort.csv");
 
-    for (int n = 1; n <= size; n++) {
+    for (int n = start; n <= size; n += step) {
         cout << "Reverse Insertion sort size: " << n << endl;
         double time = 0;
         int* A = generateReverseSortedArray(n);
@@ -377,12 +377,12 @@ void reverseInsertionTest(int size) {
  * Perform a test of the insertion sort on randomized array
  * The seed is used to generate the same sets of random arrays
 */
-void randomInsertionTest(int size, int seed) {
+void randomInsertionTest(int start, int size, int step, int seed) {
     int* seedArray = generateRandomArray(size, seed); 
 
     ofstream outFile("./output/RandomInsertionSort.csv");
 
-    for (int n = size; n >= 1; n--) {
+    for (int n = start; n <= size; n += step) {
         int* A = generateRandomArray(n, seedArray[n]);
 
         cout << "Random Insertion sort size " << n << endl;
@@ -416,10 +416,7 @@ int main(int argc, char** argv) {
     
     thread randIns(randomInsertionTest, 10000, randSeed);
     randIns.join();*/
-    int begin = atoi(argv[2]);
-    int end = atoi(argv[3]);
-    string number = argv[4];
-    int starting = atoi(argv[5]);
+    
 
     /*
     thread randQuiTwo(randomQuickTest, begin, end, randSeed, partitionTwoPointer, "Two", number);
@@ -432,25 +429,6 @@ int main(int argc, char** argv) {
     randQuiMed.join();
     thread randQuiMid(randomQuickTest, begin, end, randSeed, partitionMiddleIndex, "Middle", number);
     randQuiMid.join();*/
-
-    if (starting == 0) {
-        randomQuickTest(begin, end, randSeed, partitionTwoPointer, "Two", number);
-        randomQuickTest(begin, end, randSeed, partitionOnePointer, "One", number);
-        randomQuickTest(begin, end, randSeed, partitionMedianThree, "Median", number);
-        randomQuickTest(begin, end, randSeed, partitionMiddleIndex, "Middle", number);
-    }
-    else if (starting == 1) {
-        randomQuickTest(begin, end, randSeed, partitionOnePointer, "One", number);
-        randomQuickTest(begin, end, randSeed, partitionMedianThree, "Median", number);
-        randomQuickTest(begin, end, randSeed, partitionMiddleIndex, "Middle", number);
-    }
-    else if (starting == 2) {
-        randomQuickTest(begin, end, randSeed, partitionMedianThree, "Median", number);
-        randomQuickTest(begin, end, randSeed, partitionMiddleIndex, "Middle", number);
-    }
-    else if (starting == 3) {
-        randomQuickTest(begin, end, randSeed, partitionMiddleIndex, "Middle", number);
-    }
 
     auto stop = chrono::high_resolution_clock::now();
     auto duration = chrono::duration_cast<chrono::minutes>(stop-start);
