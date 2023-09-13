@@ -7,6 +7,7 @@
 #include <random>
 #include <string>
 #include <functional>
+#include <chrono>
 
 using namespace std;
 
@@ -273,7 +274,7 @@ void randomQuickTest(int size, int seed, function<int(int[], int, int)> partitio
 
     ofstream outFile("./output/RandomQuickSort" + name + ".csv");
 
-    for (int n = 0; n <= size; n++) {
+    for (int n = size; n >= 1; n--) {
         int* A = generateRandomArray(n, seedArray[n]);
 
         cout << "Random Quick " + name + " sort size " << n << endl;
@@ -282,6 +283,7 @@ void randomQuickTest(int size, int seed, function<int(int[], int, int)> partitio
 
         delete[] A;
     }
+    delete[] seedArray;
     outFile.close();
 }
 
@@ -362,15 +364,11 @@ void reverseInsertionTest(int size) {
  * The seed is used to generate the same sets of random arrays
 */
 void randomInsertionTest(int size, int seed) {
-    if (size > 10000) {
-        return;
-    }
-
     int* seedArray = generateRandomArray(size, seed); 
 
     ofstream outFile("./output/RandomInsertionSort.csv");
 
-    for (int n = 0; n <= size; n++) {
+    for (int n = size; n >= 1; n--) {
         int* A = generateRandomArray(n, seedArray[n]);
 
         cout << "Random Insertion sort size " << n << endl;
@@ -379,36 +377,46 @@ void randomInsertionTest(int size, int seed) {
 
         delete[] A;
     }
+    delete[] seedArray;
     outFile.close();
 }
 
 int main() {
     srand(time(0));
+    auto start = chrono::high_resolution_clock::now();
+    
     int randSeed = (rand() % 1000000) + 1;
-
+    //int randSeed = 0;
+    /*
     thread forIns(forwardInsertionTest, 10000);
     thread revIns(reverseInsertionTest, 10000);
-    thread randIns(randomInsertionTest, 10000, randSeed);
-
-    thread forQui(forwardQuickTest, 1000000, partitionOnePointer);
-    thread revQui(reverseQuickTest, 1000000, partitionOnePointer);
-    thread randQuiTwo(randomQuickTest, 1000000, randSeed, partitionTwoPointer, "Two");
-    thread randQuiOne(randomQuickTest, 1000000, randSeed, partitionOnePointer, "One");
-    thread randQuiMed(randomQuickTest, 1000000, randSeed, partitionMedianThree, "Median");
-    thread randQuiMid(randomQuickTest, 1000000, randSeed, partitionMiddleIndex, "Middle");
-
+    
     forIns.join();
     revIns.join();
-    randIns.join();
-
+    
+    thread forQui(forwardQuickTest, 1000000, partitionOnePointer);
+    thread revQui(reverseQuickTest, 1000000, partitionOnePointer);
+    
     forQui.join();
     revQui.join();
+    */
+    thread randIns(randomInsertionTest, 10000, randSeed);
+    randIns.join();
+    thread randQuiTwo(randomQuickTest, 1000000, randSeed, partitionTwoPointer, "Two");
+    thread randQuiOne(randomQuickTest, 1000000, randSeed, partitionOnePointer, "One");
     randQuiTwo.join();
     randQuiOne.join();
+    thread randQuiMed(randomQuickTest, 1000000, randSeed, partitionMedianThree, "Median");
+    thread randQuiMid(randomQuickTest, 1000000, randSeed, partitionMiddleIndex, "Middle");
     randQuiMed.join();
     randQuiMid.join();
 
+    auto stop = chrono::high_resolution_clock::now();
+    auto duration = chrono::duration_cast<chrono::minutes>(stop-start);
+
+    cout << "***************************************************************" << endl;
     cout << "Completed all tests" << endl;
+    cout << "\t Time elapsed: " << duration.count() << "\n";
 
     return 0;
 }
