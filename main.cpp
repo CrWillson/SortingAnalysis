@@ -409,44 +409,44 @@ int main(int argc, char** argv) {
     //int randSeed = (rand() % 1000000) + 1;
     int randSeed = 420;
     
-    thread insFor(forwardInsertionTest, 2, 10000, 2);
-    thread insRev(reverseInsertionTest, 2, 10000, 2);
-    thread insRand(randomInsertionTest, 2, 10000, 2, randSeed);
+    //thread insFor(forwardInsertionTest, 2, 10000, 2);
+    //thread insRev(reverseInsertionTest, 2, 10000, 2);
+    thread insRand(randomInsertionTest, 1, 500, 1, randSeed);
 
-    thread quickForLast(forwardQuickTest, 2, 10000, 2, partitionTwoPointer, "Last");
-    thread quickForMedian(forwardQuickTest, 2, 10000, 2, partitionMedianThree, "Median");
-    thread quickForMiddle(forwardQuickTest, 2, 10000, 2, partitionMiddleIndex, "Middle");
+    //thread quickForLast(forwardQuickTest, 2, 10000, 2, partitionTwoPointer, "Last");
+    //thread quickForMedian(forwardQuickTest, 2, 10000, 2, partitionMedianThree, "Median");
+    //thread quickForMiddle(forwardQuickTest, 2, 10000, 2, partitionMiddleIndex, "Middle");
 
-    thread quickRevLast(reverseQuickTest, 2, 10000, 2, partitionTwoPointer, "Last");
-    thread quickRevMedian(reverseQuickTest, 2, 10000, 2, partitionMedianThree, "Median");
-    thread quickRevMiddle(reverseQuickTest, 2, 10000, 2, partitionMiddleIndex, "Middle");
+    //thread quickRevLast(reverseQuickTest, 2, 10000, 2, partitionTwoPointer, "Last");
+    //thread quickRevMedian(reverseQuickTest, 2, 10000, 2, partitionMedianThree, "Median");
+    //thread quickRevMiddle(reverseQuickTest, 2, 10000, 2, partitionMiddleIndex, "Middle");
 
-    thread quickRandTwoPSm(randomQuickTest, 2, 10000, 2, randSeed, partitionTwoPointer, "TwoPointerSm");
-    thread quickRandTwoPXl(randomQuickTest, 250, 1000000, 250, randSeed, partitionTwoPointer, "TwoPointerXl");
-    thread quickRandOneP(randomQuickTest, 250, 1000000, 250, randSeed, partitionOnePointer, "OnePointer");
-    thread quickRandMedian(randomQuickTest, 250, 1000000, 250, randSeed, partitionMedianThree, "Median");
-    thread quickRandMiddle(randomQuickTest, 250, 1000000, 250, randSeed, partitionMiddleIndex, "Middle");
+    thread quickRandTwoPSm(randomQuickTest, 1, 500, 1, randSeed, partitionTwoPointer, "TwoPointerSm");
+    //thread quickRandTwoPXl(randomQuickTest, 250, 1000000, 250, randSeed, partitionTwoPointer, "TwoPointerXl");
+    //thread quickRandOneP(randomQuickTest, 250, 1000000, 250, randSeed, partitionOnePointer, "OnePointer");
+    //thread quickRandMedian(randomQuickTest, 250, 1000000, 250, randSeed, partitionMedianThree, "Median");
+    //thread quickRandMiddle(randomQuickTest, 250, 1000000, 250, randSeed, partitionMiddleIndex, "Middle");
 
-    insFor.join();
-    insRev.join();
+    //insFor.join();
+    //insRev.join();
     insRand.join();
 
-    quickForLast.join();
-    quickForMedian.join();
-    quickForMiddle.join();
+    //quickForLast.join();
+    //quickForMedian.join();
+    //quickForMiddle.join();
 
-    quickRevLast.join();
-    quickRevMedian.join();
-    quickRevMiddle.join();
+    //quickRevLast.join();
+    //quickRevMedian.join();
+    //quickRevMiddle.join();
 
     quickRandTwoPSm.join();
-    quickRandTwoPXl.join();
-    quickRandOneP.join();
-    quickRandMedian.join();
-    quickRandMiddle.join();
+    //quickRandTwoPXl.join();
+    //quickRandOneP.join();
+    //quickRandMedian.join();
+    //quickRandMiddle.join();
 
     auto stop = chrono::high_resolution_clock::now();
-    auto duration = chrono::duration_cast<chrono::seconds>(stop-start);
+    auto duration = chrono::duration_cast<chrono::milliseconds>(stop-start);
 
     cout << "***************************************************************" << endl;
     cout << "Completed all tests" << endl;
